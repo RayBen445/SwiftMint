@@ -1,0 +1,11 @@
+{
+  "name": "swiftmint-api",
+  "version": "1.0.0",
+  "description": "SwiftMint Vercel Serverless API Functions",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@vercel/node": "^3.0.0",
+    "typescript": "^5.3.0"
+  }
+}
