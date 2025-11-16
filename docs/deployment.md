@@ -185,37 +185,34 @@ This deploys to your production domain.
 ```json
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/dist"
-      }
-    },
-    {
-      "src": "api/**/*.ts",
-      "use": "@vercel/node"
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install --prefix frontend",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@3.0.11"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/dist/$1"
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ]
 }
 ```
 
 **Explanation:**
-- `builds`: Defines how to build the project
-  - Frontend: Static build with Vite
-  - API: Serverless Node.js functions
-- `routes`: URL routing configuration
+- `buildCommand`: Build command to run (installs deps and builds frontend)
+- `outputDirectory`: Where the static files are output (frontend/dist)
+- `installCommand`: Install dependencies for the build
+- `functions`: Configures serverless API functions
+  - API functions in `api/` directory use Node.js runtime
+- `rewrites`: URL routing configuration
   - `/api/*` routes to serverless functions
   - All other routes serve the frontend SPA
 
