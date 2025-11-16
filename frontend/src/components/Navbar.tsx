@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
+  const { isAuthenticated, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -59,7 +61,15 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="btn-secondary text-sm">Login</button>
+            {isAuthenticated ? (
+              <Link to="/profile" className="btn-secondary text-sm">
+                {user?.name || 'Profile'}
+              </Link>
+            ) : (
+              <Link to="/login" className="btn-secondary text-sm">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>
