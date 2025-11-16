@@ -228,19 +228,6 @@ const Receipt: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30';
-      case 'pending':
-        return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30';
-      case 'failed':
-        return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
-      default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
-    }
-  };
-
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'send':
@@ -327,103 +314,196 @@ const Receipt: React.FC = () => {
       {/* Receipt Container */}
       <div
         ref={receiptRef}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 print:shadow-none"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden print:shadow-none"
       >
-        {/* Header */}
-        <div className="text-center mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-          <div className="text-4xl mb-4">⚡</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">SwiftMint</h1>
-          <p className="text-gray-600 dark:text-gray-400">Transaction Receipt</p>
+        {/* Decorative Header with Gradient */}
+        <div className="relative bg-gradient-to-br from-sky-500 via-blue-600 to-fuchsia-600 p-8 text-white">
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-3xl">⚡</span>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">SwiftMint</h1>
+                  <p className="text-sm text-blue-100">Instant Global Payments</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-blue-100">Receipt #</p>
+                <p className="font-mono font-bold">{transaction.id}</p>
+              </div>
+            </div>
+
+            {/* Status Badge */}
+            <div className="flex justify-center">
+              <div className={`px-6 py-3 rounded-full font-bold text-lg backdrop-blur-sm ${
+                transaction.status === 'completed' 
+                  ? 'bg-green-500/90 text-white' 
+                  : transaction.status === 'pending'
+                  ? 'bg-yellow-500/90 text-white'
+                  : 'bg-red-500/90 text-white'
+              }`}>
+                {transaction.status === 'completed' ? '✓' : transaction.status === 'pending' ? '⏳' : '✕'} {transaction.status.toUpperCase()}
+              </div>
+            </div>
+          </div>
+          
+          {/* Decorative Wave */}
+          <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1200 120" preserveAspectRatio="none" style={{ height: '60px' }}>
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-white dark:fill-gray-800"></path>
+          </svg>
         </div>
 
-        {/* Status Badge */}
-        <div className="flex justify-center mb-8">
-          <div className={`px-6 py-3 rounded-full font-bold text-lg ${getStatusColor(transaction.status)}`}>
-            {transaction.status === 'completed' ? '✓' : transaction.status === 'pending' ? '⏳' : '✕'} {transaction.status.toUpperCase()}
+        <div className="p-8 pt-4">
+
+        {/* Transaction Type Badge */}
+        <div className="flex justify-center -mt-6 mb-8">
+          <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
+            <span className="text-2xl">{getTypeIcon(transaction.type)}</span>
+            <span className="font-bold text-lg">{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} Transaction</span>
           </div>
         </div>
 
-        {/* Transaction Details */}
-        <div className="space-y-6 mb-8">
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction ID</p>
-              <p className="font-mono font-semibold text-gray-900 dark:text-white">{transaction.id}</p>
+        {/* Main Amount Display */}
+        <div className="text-center mb-8 py-6 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 rounded-xl">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Total Amount</p>
+          <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-fuchsia-600 dark:from-sky-400 dark:to-fuchsia-400">
+            {transaction.currency} {(transaction.amount + transaction.fee).toFixed(2)}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {transaction.amount.toFixed(2)} + {transaction.fee.toFixed(2)} fee
+          </p>
+        </div>
+
+        {/* Transaction Details Grid */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-blue-50 to-sky-50 dark:from-gray-900 dark:to-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xl">📅</span>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Date & Time</p>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  {transaction.timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
-              <p className="font-semibold text-gray-900 dark:text-white">
-                {getTypeIcon(transaction.type)} {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-              </p>
-            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 ml-13">
+              {transaction.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Date & Time</p>
-              <p className="font-semibold text-gray-900 dark:text-white">
-                {transaction.timestamp.toLocaleDateString()} at {transaction.timestamp.toLocaleTimeString()}
-              </p>
+          <div className="bg-gradient-to-br from-purple-50 to-fuchsia-50 dark:from-gray-900 dark:to-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-800">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xl">💳</span>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Transaction Type</p>
+                <p className="font-semibold text-gray-900 dark:text-white capitalize">
+                  {transaction.type}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
-              <p className="font-semibold text-gray-900 dark:text-white capitalize">{transaction.status}</p>
-            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 ml-13">
+              {transaction.status === 'completed' ? 'Successfully processed' : transaction.status === 'pending' ? 'Processing...' : 'Transaction failed'}
+            </p>
           </div>
 
           {transaction.recipient && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Recipient</p>
-              <p className="font-mono text-gray-900 dark:text-white">{transaction.recipient}</p>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xl">👤</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Recipient</p>
+                  <p className="font-mono text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {transaction.recipient}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
           {transaction.sender && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Sender</p>
-              <p className="font-mono text-gray-900 dark:text-white">{transaction.sender}</p>
-            </div>
-          )}
-
-          {transaction.note && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Note</p>
-              <p className="text-gray-900 dark:text-white">{transaction.note}</p>
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-orange-900/20 p-4 rounded-xl border border-orange-100 dark:border-orange-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xl">📤</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Sender</p>
+                  <p className="font-mono text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {transaction.sender}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
 
+        {transaction.note && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-r-xl mb-8">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📝</span>
+              <div>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Note</p>
+                <p className="text-gray-700 dark:text-gray-300">{transaction.note}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Amount Breakdown */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Amount Details</h3>
+        <div className="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-purple-900/10 rounded-2xl p-6 mb-8 border-2 border-blue-100 dark:border-blue-800">
+          <div className="flex items-center gap-2 mb-5">
+            <span className="text-2xl">💰</span>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Breakdown</h3>
+          </div>
           
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Amount</span>
-              <span className="font-semibold text-gray-900 dark:text-white">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">📊</span>
+                <span className="text-gray-700 dark:text-gray-300">Base Amount</span>
+              </div>
+              <span className="font-bold text-gray-900 dark:text-white text-lg">
                 {transaction.currency} {transaction.amount.toFixed(2)}
               </span>
             </div>
             
-            <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Fee (0.1%)</span>
-              <span className="font-semibold text-gray-900 dark:text-white">
+            <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✨</span>
+                <span className="text-gray-700 dark:text-gray-300">Service Fee (0.1%)</span>
+              </div>
+              <span className="font-bold text-green-600 dark:text-green-400 text-lg">
                 {transaction.currency} {transaction.fee.toFixed(2)}
               </span>
             </div>
 
             {transaction.toAmount && transaction.toCurrency && (
-              <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-                <span className="text-gray-600 dark:text-gray-400">Converted to</span>
-                <span className="font-semibold text-gray-900 dark:text-white">
+              <div className="flex justify-between items-center p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg border border-purple-200 dark:border-purple-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-500">🔄</span>
+                  <span className="text-gray-700 dark:text-gray-300">Converted Amount</span>
+                </div>
+                <span className="font-bold text-purple-600 dark:text-purple-400 text-lg">
                   {transaction.toCurrency} {transaction.toAmount.toFixed(2)}
                 </span>
               </div>
             )}
             
-            <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-              <span className="font-bold text-gray-900 dark:text-white">Total</span>
-              <span className="font-bold text-xl text-gray-900 dark:text-white">
+            <div className="flex justify-between items-center p-4 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl text-white shadow-lg mt-4">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">💎</span>
+                <span className="font-bold text-lg">Total Paid</span>
+              </div>
+              <span className="font-bold text-2xl">
                 {transaction.currency} {(transaction.amount + transaction.fee).toFixed(2)}
               </span>
             </div>
@@ -432,33 +512,72 @@ const Receipt: React.FC = () => {
 
         {/* Transaction Hash */}
         <div className="mb-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Transaction Hash</p>
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-between">
-            <code className="font-mono text-sm text-gray-900 dark:text-white break-all">
-              {transaction.transactionHash}
-            </code>
-            <button
-              onClick={copyToClipboard}
-              className="ml-4 p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-              title="Copy hash"
-            >
-              📋
-            </button>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl">🔐</span>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">Transaction Hash</p>
+          </div>
+          <div className="bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-900 dark:to-blue-900/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3">
+              <code className="flex-1 font-mono text-xs text-gray-900 dark:text-white break-all">
+                {transaction.transactionHash}
+              </code>
+              <button
+                onClick={copyToClipboard}
+                className="flex-shrink-0 p-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm border border-gray-200 dark:border-gray-700"
+                title="Copy hash"
+              >
+                <span className="text-xl">📋</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Security Badge */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-l-4 border-green-500 p-4 rounded-r-xl mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-2xl">✓</span>
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 dark:text-white">Verified Transaction</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                This transaction has been verified and recorded on the SwiftMint blockchain
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-center pt-8 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            ⚡ SwiftMint - Instant Global Micro-Payments
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            Ultra-low fees · Instant transfers · Multi-currency support
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">
-            This is an official receipt from SwiftMint. Keep this for your records.
-          </p>
+        <div className="text-center pt-8 border-t-2 border-dashed border-gray-300 dark:border-gray-700">
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-fuchsia-500 text-white rounded-full text-sm font-semibold">
+              <span>⚡</span>
+              <span>SwiftMint - Instant Global Micro-Payments</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <span className="flex items-center gap-1">
+              <span>💸</span>
+              <span>Ultra-low fees</span>
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <span>⚡</span>
+              <span>Instant transfers</span>
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <span>🌍</span>
+              <span>18+ currencies</span>
+            </span>
+          </div>
+          <div className="text-xs text-gray-400 dark:text-gray-600 space-y-1">
+            <p>This is an official receipt from SwiftMint.</p>
+            <p>Keep this for your records. Transaction ID: {transaction.id}</p>
+            <p className="font-mono text-xs mt-2">Generated on {new Date().toLocaleString()}</p>
+          </div>
         </div>
+      </div>
       </div>
 
       {/* Share Modal */}
