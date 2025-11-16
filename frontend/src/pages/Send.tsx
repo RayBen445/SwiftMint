@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CurrencySelector from '../components/CurrencySelector';
 import { sendMoney } from '../utils/api';
 
 const Send: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     toWallet: '',
     amount: '',
@@ -29,6 +31,15 @@ const Send: React.FC = () => {
       });
 
       setResult(response);
+      
+      // Store transaction data in localStorage and redirect to receipt
+      localStorage.setItem('lastTransaction', JSON.stringify(response.transaction));
+      
+      // Show success briefly then redirect
+      setTimeout(() => {
+        navigate('/receipt');
+      }, 1500);
+      
       setFormData({ toWallet: '', amount: '', currency: 'USD', note: '' });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send money');

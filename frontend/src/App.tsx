@@ -17,6 +17,10 @@ import Beneficiaries from './pages/Beneficiaries';
 import Receipt from './pages/Receipt';
 import ScheduledPayments from './pages/ScheduledPayments';
 import PaymentTemplates from './pages/PaymentTemplates';
+import QRPayment from './pages/QRPayment';
+import SplitPayment from './pages/SplitPayment';
+import Analytics from './pages/Analytics';
+import Budget from './pages/Budget';
 
 function App() {
   return (
@@ -39,9 +43,13 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/beneficiaries" element={<Beneficiaries />} />
-                  <Route path="/receipt/:id" element={<Receipt />} />
+                  <Route path="/receipt/:id?" element={<Receipt />} />
                   <Route path="/scheduled" element={<ScheduledPayments />} />
                   <Route path="/templates" element={<PaymentTemplates />} />
+                  <Route path="/qr-payment" element={<QRPayment />} />
+                  <Route path="/split-payment" element={<SplitPayment />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/budget" element={<Budget />} />
                 </Routes>
               </main>
               <footer className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-16 transition-colors">

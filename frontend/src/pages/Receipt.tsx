@@ -28,19 +28,34 @@ const Receipt: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  // Mock transaction data - in production, fetch from API
-  const transaction: Transaction = {
-    id: id || 'TXN-2024-001',
-    type: 'send',
-    status: 'completed',
-    amount: 100.00,
-    currency: 'USD',
-    recipient: 'wallet_abc123',
-    note: 'Payment for services',
-    fee: 0.10,
-    timestamp: new Date(),
-    transactionHash: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+  // Load transaction data from localStorage or use mock data
+  const getTransactionData = (): Transaction => {
+    const storedTransaction = localStorage.getItem('lastTransaction');
+    
+    if (storedTransaction) {
+      const parsed = JSON.parse(storedTransaction);
+      return {
+        ...parsed,
+        timestamp: new Date(parsed.timestamp || Date.now()),
+      };
+    }
+    
+    // Fallback to mock data
+    return {
+      id: id || 'TXN-2024-001',
+      type: 'send',
+      status: 'completed',
+      amount: 100.00,
+      currency: 'USD',
+      recipient: 'wallet_abc123',
+      note: 'Payment for services',
+      fee: 0.10,
+      timestamp: new Date(),
+      transactionHash: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    };
   };
+
+  const transaction: Transaction = getTransactionData();
 
   const downloadAsPDF = async () => {
     setIsDownloading(true);
