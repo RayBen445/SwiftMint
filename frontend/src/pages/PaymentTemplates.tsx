@@ -75,7 +75,11 @@ const PaymentTemplates: React.FC = () => {
 
   const handleCreateTemplate = () => {
     if (!newTemplate.name || !newTemplate.recipientWalletId || !newTemplate.amount) {
-      addNotification('Please fill in all required fields', 'error');
+      addNotification({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Please fill in all required fields',
+      });
       return;
     }
 
@@ -93,7 +97,11 @@ const PaymentTemplates: React.FC = () => {
     };
 
     setTemplates([...templates, template]);
-    addNotification('Template created successfully!', 'success');
+    addNotification({
+      type: 'success',
+      title: 'Template Created',
+      message: 'Template created successfully!',
+    });
     setShowCreateModal(false);
     setNewTemplate({
       name: '',
@@ -107,12 +115,20 @@ const PaymentTemplates: React.FC = () => {
 
   const deleteTemplate = (id: string) => {
     setTemplates(templates.filter((t) => t.id !== id));
-    addNotification('Template deleted', 'success');
+    addNotification({
+      type: 'success',
+      title: 'Template Deleted',
+      message: 'Template deleted successfully',
+    });
   };
 
   const useTemplate = (template: PaymentTemplate) => {
     // Navigate to send page with pre-filled data
-    addNotification('Template applied! Complete the payment.', 'info');
+    addNotification({
+      type: 'info',
+      title: 'Template Applied',
+      message: 'Template applied! Complete the payment.',
+    });
     navigate(`/send?template=${template.id}`);
   };
 

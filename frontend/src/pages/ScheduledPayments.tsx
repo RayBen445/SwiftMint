@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/NotificationContext';
 
 interface ScheduledPayment {
@@ -17,7 +16,6 @@ interface ScheduledPayment {
 }
 
 const ScheduledPayments: React.FC = () => {
-  const navigate = useNavigate();
   const { addNotification } = useNotifications();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('active');
@@ -61,7 +59,11 @@ const ScheduledPayments: React.FC = () => {
 
   const handleCreatePayment = () => {
     if (!newPayment.recipientWalletId || !newPayment.amount || !newPayment.date) {
-      addNotification('Please fill in all required fields', 'error');
+      addNotification({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Please fill in all required fields',
+      });
       return;
     }
 
@@ -81,7 +83,11 @@ const ScheduledPayments: React.FC = () => {
     };
 
     setScheduledPayments([...scheduledPayments, payment]);
-    addNotification('Scheduled payment created successfully!', 'success');
+    addNotification({
+      type: 'success',
+      title: 'Payment Scheduled',
+      message: 'Scheduled payment created successfully!',
+    });
     setShowCreateModal(false);
     setNewPayment({
       recipientWalletId: '',
@@ -100,16 +106,26 @@ const ScheduledPayments: React.FC = () => {
         p.id === id ? { ...p, status: 'cancelled' as const } : p
       )
     );
-    addNotification('Scheduled payment cancelled', 'success');
+    addNotification({
+      type: 'success',
+      title: 'Payment Cancelled',
+      message: 'Scheduled payment cancelled successfully',
+    });
   };
 
   const pausePayment = (id: string) => {
+    const payment = scheduledPayments.find(p => p.id === id);
+    const isPaused = payment?.status === 'paused';
     setScheduledPayments(
       scheduledPayments.map((p) =>
-        p.id === id ? { ...p, status: p.status === 'paused' ? 'active' as const : 'paused' as const } : p
+        p.id === id ? { ...p, status: isPaused ? 'active' as const : 'paused' as const } : p
       )
     );
-    addNotification(`Payment ${scheduledPayments.find(p => p.id === id)?.status === 'paused' ? 'resumed' : 'paused'}`, 'success');
+    addNotification({
+      type: 'success',
+      title: isPaused ? 'Payment Resumed' : 'Payment Paused',
+      message: `Payment ${isPaused ? 'resumed' : 'paused'} successfully`,
+    });
   };
 
   const filteredPayments = scheduledPayments.filter((p) =>
